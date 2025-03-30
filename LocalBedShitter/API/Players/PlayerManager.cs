@@ -12,7 +12,7 @@ public sealed class PlayerManager : IPacketProcessor, IDisposable
 
     public event Action<RemotePlayer>? Connected;
     public event Action<RemotePlayer>? Disconnected;
-    public event Action<RemotePlayer, string>? Messaged; 
+    public event Action<RemotePlayer, string>? Message; 
     
     private readonly NetworkManager _manager;
 
@@ -57,7 +57,7 @@ public sealed class PlayerManager : IPacketProcessor, IDisposable
             case MessagePacket message:
                 if (TryGetById(message.PlayerId, out player))
                 {
-                    Messaged?.Invoke(player, message.SanitizedContent);
+                    Message?.Invoke(player, message.SanitizedContent);
                 }
 
                 break;

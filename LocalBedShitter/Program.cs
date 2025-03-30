@@ -1,41 +1,23 @@
-﻿// See https://aka.ms/new-console-template for more information
-
+﻿using System.CommandLine;
 using System.Net;
 using System.Net.Sockets;
-using LocalBedShitter.API;
-using LocalBedShitter.API.Players;
+using LocalBedShitter;
 using LocalBedShitter.Networking;
 
-internal class Program
+Option<string> usernameOption = new("--username", "Username for the bot");
+Option<string> ipOption = new("--ip", "Target server IPv4 address");
+Option<int> portOption = new("--port", "Target server port");
+Option<string> mpPassOption = new("--mpPass", "Target server mppass");
+
+RootCommand rootCommand = [usernameOption, ipOption, portOption, mpPassOption];
+rootCommand.SetHandler(async (username, ip, port, mpPass) =>
 {
-    public static async Task Main(string[] args)
-    {
-        using TcpClient client = new(AddressFamily.InterNetwork);
-        await client.ConnectAsync(IPAddress.Parse("92.119.126.203"), 65535);
+    using TcpClient client = new(AddressFamily.InterNetwork);
+    await client.ConnectAsync(IPAddress.Parse(ip), port);
 
-        await using NetworkManager manager = new(client);
-        using CancellationTokenSource cancelSource = new();
+    await using NetworkManager manager = new(client);
+    using Bot bot = new(manager, username, mpPass);
+    await bot.RunAsync();
+}, usernameOption, ipOption, portOption, mpPassOption);
 
-        using PlayerManager playerManager = new(manager);
-        using LocalPlayer localPlayer = new(manager, "localbedshitter");
-
-        playerManager.Messaged += (player, content) =>
-        {
-            int colonIndex = content.IndexOf(':');
-            
-            if (colonIndex < 0) return;
-            string actualContent = content[(colonIndex + 1)..].Trim();
-            
-            if (!actualContent.StartsWith('^')) return;
-            localPlayer.SendMessage($"{player.Username} invoked '{actualContent[1..]}'");    
-        };
-        
-        localPlayer.Authenticate("9be213a6bd85dd02ce7dd56bec0d9e20");
-        
-        while (true)
-        {
-            manager.Poll();
-            await Task.Delay(20);
-        }
-    }
-}
+return await rootCommand.InvokeAsync(args);
