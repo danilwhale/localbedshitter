@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using LocalBedShitter.Networking;
 using LocalBedShitter.Networking.Packets;
+using LocalBedShitter.Networking.Packets.Both;
 using LocalBedShitter.Networking.Packets.C2S;
 using LocalBedShitter.Networking.Packets.S2C;
 
@@ -39,7 +40,7 @@ public sealed class LocalPlayer(NetworkManager manager, string username)
     public void SendMessage(string message)
     {
         ObjectDisposedException.ThrowIf(IsDisposed, typeof(LocalPlayer));
-        Manager.SendPacket(new MessageC2SPacket(message));
+        Manager.SendPacket(new MessagePacket(-1, message));
     }
 
     public override void ProcessPacket(ref readonly IPacket packet)

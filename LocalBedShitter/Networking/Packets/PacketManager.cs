@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using LocalBedShitter.Networking.Packets.Both;
 using LocalBedShitter.Networking.Packets.C2S;
 using LocalBedShitter.Networking.Packets.S2C;
 
@@ -62,7 +63,6 @@ public static class PacketManager
         Register<PlayerIdC2SPacket>(0x00);
         Register<SetBlockC2SPacket>(0x05);
         Register<TeleportC2SPacket>(0x08);
-        Register<MessageC2SPacket>(0x0d);
     }
 
     private static void RegisterS2C()
@@ -79,14 +79,19 @@ public static class PacketManager
         Register<MoveS2CPacket>(0x0a);
         Register<RotateS2CPacket>(0x0b);
         Register<DespawnPlayerS2CPacket>(0x0c);
-        Register<MessageS2CPacket>(0x0d);
         Register<DisconnectPlayerS2CPacket>(0x0e);
         Register<UpdateUserTypeS2CPacket>(0x0f);
+    }
+
+    private static void RegisterBoth()
+    {
+        Register<MessagePacket>(0x0d);
     }
 
     static PacketManager()
     {
         RegisterC2S();
         RegisterS2C();
+        RegisterBoth();
     }
 }

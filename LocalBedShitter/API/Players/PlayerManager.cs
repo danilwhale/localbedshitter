@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using LocalBedShitter.Networking;
 using LocalBedShitter.Networking.Packets;
+using LocalBedShitter.Networking.Packets.Both;
 using LocalBedShitter.Networking.Packets.S2C;
 
 namespace LocalBedShitter.API.Players;
@@ -53,7 +54,7 @@ public sealed class PlayerManager : IPacketProcessor, IDisposable
                 }
 
                 break;
-            case MessageS2CPacket message:
+            case MessagePacket message:
                 if (TryGetById(message.PlayerId, out player))
                 {
                     Messaged?.Invoke(player, message.SanitizedContent);
