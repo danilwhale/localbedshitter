@@ -1,0 +1,16 @@
+﻿namespace LocalBedShitter.Packets.S2C;
+
+public struct PingS2CPacket : IPacket
+{
+    public const int SizeInBytes = 0;
+    
+    public int Length => SizeInBytes;
+    
+    public void Read(PacketReader reader)
+    {
+    }
+
+    public void Write(PacketWriter writer)
+    {
+    }
+}
