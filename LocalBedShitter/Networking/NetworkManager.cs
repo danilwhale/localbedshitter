@@ -48,7 +48,6 @@ public sealed class NetworkManager : IAsyncDisposable
         try
         {
             PacketManager.Write(_stream, packet);
-            Console.WriteLine($"{packet} -> server");
         }
         catch (Exception ex)
         {
