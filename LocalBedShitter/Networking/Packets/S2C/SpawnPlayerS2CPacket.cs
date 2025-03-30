@@ -23,8 +23,8 @@ public struct SpawnPlayerS2CPacket : IPacket
             (float)reader.ReadShort() / (1 << 5)
         );
         Rotation = new Vector2(
-            360 * (reader.ReadByte() / 255.0f),
-            360 * (reader.ReadByte() / 255.0f)
+            360 * (reader.ReadByte() / 256.0f),
+            360 * (reader.ReadByte() / 256.0f)
         );
     }
 
@@ -35,7 +35,7 @@ public struct SpawnPlayerS2CPacket : IPacket
         writer.WriteShort((short)(Position.X * (1 << 5)));
         writer.WriteShort((short)(Position.Y * (1 << 5)));
         writer.WriteShort((short)(Position.Z * (1 << 5)));
-        writer.WriteByte((byte)(Rotation.Y / 360.0f * 255));
-        writer.WriteByte((byte)(Rotation.X / 360.0f * 255));
+        writer.WriteByte((byte)(Rotation.Y / 360.0f * 256));
+        writer.WriteByte((byte)(Rotation.X / 360.0f * 256));
     }
 }

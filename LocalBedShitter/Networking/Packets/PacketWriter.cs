@@ -21,7 +21,8 @@ public ref struct PacketWriter(Span<byte> buffer)
 
     public void WriteString(string value)
     {
-        Encoding.ASCII.GetBytes(value.PadRight(64).AsSpan()[..64], Buffer[Position..(Position + 64)]);
+        Buffer[Position..(Position + 64)].Fill(0x20);
+        Ibm437.GetBytes(value, Buffer[Position..(Position + 64)]);
         Position += 64;
     }
 

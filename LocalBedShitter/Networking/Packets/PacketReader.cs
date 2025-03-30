@@ -22,7 +22,7 @@ public ref struct PacketReader(ReadOnlySpan<byte> buffer)
 
     public string ReadString()
     {
-        string value = Encoding.ASCII.GetString(Buffer[Position..(Position + 64)]).TrimEnd(' ');
+        string value = Ibm437.GetString(Buffer[Position..(Position + 64)].Trim<byte>(0x20));
         Position += 64;
         return value;
     }

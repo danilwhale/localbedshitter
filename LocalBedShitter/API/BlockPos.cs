@@ -2,25 +2,25 @@
 
 namespace LocalBedShitter.API;
 
-public struct BlockPos(short x, short y, short z)
+public record struct BlockPos(short X, short Y, short Z)
 {
     public const int SizeInBytes = sizeof(short) * 3;
     
-    public short X = x;
-    public short Y = y;
-    public short Z = z;
-    
-    public BlockPos Up => this with { Y = (short)(Y + 1) };
-    public BlockPos Down => this with { Y = (short)(Y - 1) };
-    public BlockPos East => this with { X = (short)(X + 1) };
-    public BlockPos West => this with { X = (short)(X - 1) };
-    public BlockPos South => this with { Z = (short)(Z + 1) };
-    public BlockPos North => this with { Z = (short)(Z - 1) };
+    public short X = X;
+    public short Y = Y;
+    public short Z = Z;
 
     public BlockPos(int x, int y, int z)
         : this((short)x, (short)y, (short)z)
     {
     }
+    
+    public BlockPos Up() => this with { Y = (short)(Y + 1) };
+    public BlockPos Down() => this with { Y = (short)(Y - 1) };
+    public BlockPos East() => this with { X = (short)(X + 1) };
+    public BlockPos West() => this with { X = (short)(X - 1) };
+    public BlockPos South() => this with { Z = (short)(Z + 1) };
+    public BlockPos North() => this with { Z = (short)(Z - 1) };
 
     public void Read(PacketReader reader)
     {

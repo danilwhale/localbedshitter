@@ -57,7 +57,7 @@ public sealed class PlayerManager : IPacketProcessor, IDisposable
             case MessagePacket message:
                 if (TryGetById(message.PlayerId, out player))
                 {
-                    Message?.Invoke(player, message.SanitizedContent);
+                    Message?.Invoke(player, TextUtility.Sanitize(message.Content));
                 }
 
                 break;

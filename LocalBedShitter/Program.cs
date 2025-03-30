@@ -16,7 +16,7 @@ rootCommand.SetHandler(async (username, ip, port, mpPass) =>
     await client.ConnectAsync(IPAddress.Parse(ip), port);
 
     await using NetworkManager manager = new(client);
-    using Bot bot = new(manager, username, mpPass);
+    Bot bot = new(manager, username, mpPass);
     await bot.RunAsync();
 }, usernameOption, ipOption, portOption, mpPassOption);
 

@@ -15,15 +15,15 @@ public struct RotateS2CPacket : IPacket
     {
         PlayerId = reader.ReadSByte();
         Delta = new Vector2(
-            360 * (reader.ReadByte() / 255.0f),
-            360 * (reader.ReadByte() / 255.0f)
+            360 * (reader.ReadByte() / 256.0f),
+            360 * (reader.ReadByte() / 256.0f)
         );
     }
 
     public void Write(PacketWriter writer)
     {
         writer.WriteSByte(PlayerId);
-        writer.WriteByte((byte)(Delta.Y / 360.0f * 255));
-        writer.WriteByte((byte)(Delta.X / 360.0f * 255));
+        writer.WriteByte((byte)(Delta.Y / 360.0f * 256));
+        writer.WriteByte((byte)(Delta.X / 360.0f * 256));
     }
 }

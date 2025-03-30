@@ -15,7 +15,6 @@ public sealed class LocalPlayer(NetworkManager manager, string username)
     
     public void Authenticate(string mpPass)
     {
-        ObjectDisposedException.ThrowIf(IsDisposed, typeof(LocalPlayer));
         if (IsAuthenticated) throw new InvalidOperationException("Already authenticated!");
         Manager.SendPacket(new PlayerIdC2SPacket(Username, mpPass));
         IsAuthenticated = true;
@@ -23,8 +22,7 @@ public sealed class LocalPlayer(NetworkManager manager, string username)
     
     public void Teleport(Vector3 position, Vector2 rotation)
     {
-        ObjectDisposedException.ThrowIf(IsDisposed, typeof(LocalPlayer));
-        Manager.SendPacket(new TeleportC2SPacket(position, rotation));
+        Manager.SendPacket(new TeleportPacket(-1, position, rotation));
         Position = position;
         Rotation = rotation;
     }
@@ -33,13 +31,11 @@ public sealed class LocalPlayer(NetworkManager manager, string username)
 
     public void SetBlock(BlockPos pos, EditMode mode, byte type)
     {
-        ObjectDisposedException.ThrowIf(IsDisposed, typeof(LocalPlayer));
         Manager.SendPacket(new SetBlockC2SPacket(pos, mode, type));
     }
     
     public void SendMessage(string message)
     {
-        ObjectDisposedException.ThrowIf(IsDisposed, typeof(LocalPlayer));
         Manager.SendPacket(new MessagePacket(-1, message));
     }
 

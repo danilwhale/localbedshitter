@@ -35,10 +35,13 @@ public static class PacketManager
         if (packet == null) return false;
         
         // now read the data
-        Span<byte> buffer = stackalloc byte[packet.Length];
-        stream.ReadExactly(buffer);
-        PacketReader reader = new(buffer);
-        packet.Read(reader);
+        if (packet.Length > 0)
+        {
+            Span<byte> buffer = stackalloc byte[packet.Length];
+            stream.ReadExactly(buffer);
+            PacketReader reader = new(buffer);
+            packet.Read(reader);
+        }
 
         return true;
     }
@@ -52,7 +55,10 @@ public static class PacketManager
         Span<byte> buffer = stackalloc byte[packet.Length + 1 /* for packet id */];
         PacketWriter writer = new(buffer);
         writer.WriteByte(id);
-        packet.Write(writer);
+        if (packet.Length > 0)
+        {
+            packet.Write(writer);
+        }
 
         // and then send it to the stream
         stream.Write(buffer);
@@ -62,7 +68,6 @@ public static class PacketManager
     {
         Register<PlayerIdC2SPacket>(0x00);
         Register<SetBlockC2SPacket>(0x05);
-        Register<TeleportC2SPacket>(0x08);
     }
 
     private static void RegisterS2C()
@@ -74,7 +79,6 @@ public static class PacketManager
         Register<LevelFinalizeS2CPacket>(0x04);
         Register<SetBlockS2CPacket>(0x06);
         Register<SpawnPlayerS2CPacket>(0x07);
-        Register<TeleportS2CPacket>(0x08);
         Register<UpdateTransformS2CPacket>(0x09);
         Register<MoveS2CPacket>(0x0a);
         Register<RotateS2CPacket>(0x0b);
@@ -86,6 +90,7 @@ public static class PacketManager
     private static void RegisterBoth()
     {
         Register<MessagePacket>(0x0d);
+        Register<TeleportPacket>(0x08);
     }
 
     static PacketManager()

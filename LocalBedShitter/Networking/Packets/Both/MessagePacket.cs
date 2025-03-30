@@ -1,14 +1,10 @@
-﻿using System.Text.RegularExpressions;
+﻿namespace LocalBedShitter.Networking.Packets.Both;
 
-namespace LocalBedShitter.Networking.Packets.Both;
-
-public partial struct MessagePacket(sbyte playerId, string content) : IPacket
+public struct MessagePacket(sbyte playerId, string content) : IPacket
 {
     public const int SizeInBytes = sizeof(sbyte) + 64;
 
     public int Length => SizeInBytes;
-
-    public string SanitizedContent => ColorCodeRegex().Replace(Content, "");
     
     public sbyte PlayerId = playerId;
     public string Content = content;
@@ -24,7 +20,4 @@ public partial struct MessagePacket(sbyte playerId, string content) : IPacket
         writer.WriteSByte(PlayerId);
         writer.WriteString(Content);
     }
-
-    [GeneratedRegex("&[0-9a-fA-F]")]
-    private static partial Regex ColorCodeRegex();
 }

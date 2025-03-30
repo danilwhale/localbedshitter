@@ -1,15 +1,13 @@
 ﻿using System.Numerics;
 using LocalBedShitter.Networking;
 using LocalBedShitter.Networking.Packets;
+using LocalBedShitter.Networking.Packets.Both;
 using LocalBedShitter.Networking.Packets.S2C;
 
 namespace LocalBedShitter.API.Players;
 
-public abstract class Player : IPacketProcessor, IDisposable
+public abstract class Player : IPacketProcessor
 {
-    public bool IsDisposed;
-    public bool IsReady;
-
     public readonly sbyte Id;
     public readonly string Username;
     public BlockPos BlockPos => new(FastMath.Floor(Position.X), FastMath.Floor(Position.Y), FastMath.Floor(Position.Z));
@@ -31,7 +29,7 @@ public abstract class Player : IPacketProcessor, IDisposable
     {
         switch (packet)
         {
-            case TeleportS2CPacket teleport when teleport.PlayerId == Id:
+            case TeleportPacket teleport when teleport.PlayerId == Id:
                 Position = teleport.Position;
                 Rotation = teleport.Rotation;
                 break;
@@ -48,18 +46,7 @@ public abstract class Player : IPacketProcessor, IDisposable
             case SpawnPlayerS2CPacket spawn when spawn.PlayerId == Id:
                 Position = spawn.Position;
                 Rotation = spawn.Rotation;
-                IsReady = true;
-                break;
-            case DespawnPlayerS2CPacket despawn when despawn.PlayerId == Id:
-                Dispose();
                 break;
         }
-    }
-    
-    public void Dispose()
-    {
-        Manager.Processors.Remove(this);
-        IsDisposed = true;
-        IsReady = false;
     }
 }
