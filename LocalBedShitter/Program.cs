@@ -2,37 +2,40 @@
 
 using System.Net;
 using System.Net.Sockets;
-using System.Numerics;
-using LocalBedShitter;
-using LocalBedShitter.Packets;
-using LocalBedShitter.Packets.C2S;
-using LocalBedShitter.Packets.S2C;
+using LocalBedShitter.API;
+using LocalBedShitter.API.Players;
+using LocalBedShitter.Networking;
 
-using TcpClient client = new(AddressFamily.InterNetwork);
-client.Connect(IPAddress.Parse("92.119.126.203"), 65535);
-
-await using NetworkManager manager = new(client);
-manager.SendPacket(new PlayerIdC2SPacket("localbedshitter", "9be213a6bd85dd02ce7dd56bec0d9e20"));
-// manager.SendPacket(new MessageC2SPacket("i'm ready to shit the bed"));
-manager.SendPacket(new TeleportC2SPacket(new Vector3(512.0f, 42.0f + 1.59375f, 522.0f), new Vector2(45.0f, 45.0f)));
-
-HashSet<(sbyte player, Vector3 pos)> players = [];
-
-while (true)
+internal class Program
 {
-    while (manager.TryReceivePacket(out IPacket? packet))
+    public static async Task Main(string[] args)
     {
-        switch (packet)
+        using TcpClient client = new(AddressFamily.InterNetwork);
+        await client.ConnectAsync(IPAddress.Parse("92.119.126.203"), 65535);
+
+        await using NetworkManager manager = new(client);
+        using CancellationTokenSource cancelSource = new();
+
+        using PlayerManager playerManager = new(manager);
+        using LocalPlayer localPlayer = new(manager, "localbedshitter");
+
+        playerManager.Messaged += (player, content) =>
         {
-            case SpawnPlayerS2CPacket spawn:
-                players.Add((spawn.PlayerId, spawn.Position));
-                Console.WriteLine($"spawned {spawn.PlayerId}");
-                break;
-            case MessageS2CPacket message:
-                Console.WriteLine(message.SanitizedContent);
-                break;
+            int colonIndex = content.IndexOf(':');
+            
+            if (colonIndex < 0) return;
+            string actualContent = content[(colonIndex + 1)..].Trim();
+            
+            if (!actualContent.StartsWith('^')) return;
+            localPlayer.SendMessage($"{player.Username} invoked '{actualContent[1..]}'");    
+        };
+        
+        localPlayer.Authenticate("9be213a6bd85dd02ce7dd56bec0d9e20");
+        
+        while (true)
+        {
+            manager.Poll();
+            await Task.Delay(20);
         }
     }
-
-    await Task.Delay(10);
 }
