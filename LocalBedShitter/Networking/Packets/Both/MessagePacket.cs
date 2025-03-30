@@ -9,13 +9,13 @@ public struct MessagePacket(sbyte playerId, string content) : IPacket
     public sbyte PlayerId = playerId;
     public string Content = content;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         PlayerId = reader.ReadSByte();
         Content = reader.ReadString();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteSByte(PlayerId);
         writer.WriteString(Content);

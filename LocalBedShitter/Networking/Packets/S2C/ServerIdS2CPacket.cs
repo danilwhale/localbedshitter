@@ -14,7 +14,7 @@ public struct ServerIdS2CPacket : IPacket
     public string ServerMotd;
     public UserType UserType;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         ProtocolVersion = reader.ReadByte();
         ServerName = reader.ReadString();
@@ -22,7 +22,7 @@ public struct ServerIdS2CPacket : IPacket
         UserType = (UserType)reader.ReadByte();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteByte(ProtocolVersion);
         writer.WriteString(ServerName);

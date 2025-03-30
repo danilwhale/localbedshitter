@@ -12,7 +12,7 @@ public struct TeleportPacket(sbyte playerId, Vector3 position, Vector2 rotation)
     public Vector3 Position = position;
     public Vector2 Rotation = rotation;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         PlayerId = reader.ReadSByte();
         Position = new Vector3(
@@ -26,7 +26,7 @@ public struct TeleportPacket(sbyte playerId, Vector3 position, Vector2 rotation)
         );
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteSByte(PlayerId);
         writer.WriteShort((short)(Position.X * (1 << 5)));

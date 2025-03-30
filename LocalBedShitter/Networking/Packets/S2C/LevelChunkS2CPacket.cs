@@ -10,14 +10,14 @@ public struct LevelChunkS2CPacket : IPacket
     public byte[] Data;
     public byte PercentComplete;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         DataLength = reader.ReadShort();
         Data = reader.ReadBytes(1024).ToArray();
         PercentComplete = reader.ReadByte();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         Span<byte> paddedData = stackalloc byte[1024];
         Data.CopyTo(paddedData);

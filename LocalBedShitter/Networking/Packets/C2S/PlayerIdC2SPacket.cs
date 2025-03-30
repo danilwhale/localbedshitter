@@ -11,7 +11,7 @@ public struct PlayerIdC2SPacket(string username, string mpPass) : IPacket
     public string MpPass = mpPass;
     private byte _unused = 0;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         ProtocolVersion = reader.ReadByte();
         Username = reader.ReadString();
@@ -19,7 +19,7 @@ public struct PlayerIdC2SPacket(string username, string mpPass) : IPacket
         _unused = reader.ReadByte();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteByte(ProtocolVersion);
         writer.WriteString(Username);

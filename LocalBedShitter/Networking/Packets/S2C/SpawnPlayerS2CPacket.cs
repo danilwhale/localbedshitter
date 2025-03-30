@@ -13,7 +13,7 @@ public struct SpawnPlayerS2CPacket : IPacket
     public Vector3 Position;
     public Vector2 Rotation;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         PlayerId = reader.ReadSByte();
         Username = reader.ReadString();
@@ -28,7 +28,7 @@ public struct SpawnPlayerS2CPacket : IPacket
         );
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteSByte(PlayerId);
         writer.WriteString(Username);

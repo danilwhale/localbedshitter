@@ -40,7 +40,7 @@ public static class PacketManager
             Span<byte> buffer = stackalloc byte[packet.Length];
             stream.ReadExactly(buffer);
             PacketReader reader = new(buffer);
-            packet.Read(reader);
+            packet.Read(ref reader);
         }
 
         return true;
@@ -57,7 +57,7 @@ public static class PacketManager
         writer.WriteByte(id);
         if (packet.Length > 0)
         {
-            packet.Write(writer);
+            packet.Write(ref writer);
         }
 
         // and then send it to the stream

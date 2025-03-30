@@ -4,6 +4,6 @@ public interface IPacket
 {
     int Length { get; }
 
-    void Read(PacketReader reader);
-    void Write(PacketWriter writer);
+    void Read(ref PacketReader reader);
+    void Write(ref PacketWriter writer);
 }

@@ -8,12 +8,12 @@ public struct DisconnectPlayerS2CPacket : IPacket
 
     public string Reason;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         Reason = reader.ReadString();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteString(Reason);
     }

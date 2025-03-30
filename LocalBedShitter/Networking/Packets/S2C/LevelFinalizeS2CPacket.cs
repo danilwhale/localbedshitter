@@ -10,14 +10,14 @@ public struct LevelFinalizeS2CPacket : IPacket
     public short Height;
     public short Depth;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         Width = reader.ReadShort();
         Height = reader.ReadShort();
         Depth = reader.ReadShort();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteShort(Width);
         writer.WriteShort(Height);

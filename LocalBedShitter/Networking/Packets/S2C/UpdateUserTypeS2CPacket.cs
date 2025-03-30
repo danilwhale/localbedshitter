@@ -11,12 +11,12 @@ public struct UpdateUserTypeS2CPacket : IPacket
 
     public UserType UserType;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         UserType = (UserType)reader.ReadByte();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteByte((byte)UserType);
     }

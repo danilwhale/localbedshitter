@@ -12,16 +12,16 @@ public struct SetBlockC2SPacket(BlockPos pos, EditMode mode, byte type) : IPacke
     public EditMode Mode = mode;
     public byte Type = type;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
-        Pos.Read(reader);
+        Pos = BlockPos.Read(ref reader);
         Mode = (EditMode)reader.ReadByte();
         Type = reader.ReadByte();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
-        Pos.Write(writer);
+        BlockPos.Write(ref writer, Pos);
         writer.WriteByte((byte)Mode);
         writer.WriteByte(Type);
     }

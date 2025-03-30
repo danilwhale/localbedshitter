@@ -12,7 +12,7 @@ public struct UpdateTransformS2CPacket : IPacket
     public Vector3 PositionDelta;
     public Vector2 Rotation;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         PlayerId = reader.ReadSByte();
         PositionDelta = new Vector3(
@@ -26,7 +26,7 @@ public struct UpdateTransformS2CPacket : IPacket
         );
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteSByte(PlayerId);
         writer.WriteSByte((sbyte)(PositionDelta.X * (1 << 5)));

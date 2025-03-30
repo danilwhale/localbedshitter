@@ -11,7 +11,7 @@ public struct MoveS2CPacket : IPacket
     public sbyte PlayerId;
     public Vector3 Delta;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         PlayerId = reader.ReadSByte();
         Delta = new Vector3(
@@ -21,7 +21,7 @@ public struct MoveS2CPacket : IPacket
         );
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteSByte(PlayerId);
         writer.WriteSByte((sbyte)(Delta.X * (1 << 5)));

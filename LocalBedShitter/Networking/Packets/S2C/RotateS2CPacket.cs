@@ -11,7 +11,7 @@ public struct RotateS2CPacket : IPacket
     public sbyte PlayerId;
     public Vector2 Delta;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
         PlayerId = reader.ReadSByte();
         Delta = new Vector2(
@@ -20,7 +20,7 @@ public struct RotateS2CPacket : IPacket
         );
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
         writer.WriteSByte(PlayerId);
         writer.WriteByte((byte)(Delta.Y / 360.0f * 256));

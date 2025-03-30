@@ -6,11 +6,11 @@ public struct PingS2CPacket : IPacket
     
     public int Length => SizeInBytes;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
     }
 }

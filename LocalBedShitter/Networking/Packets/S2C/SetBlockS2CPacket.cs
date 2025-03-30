@@ -11,15 +11,15 @@ public struct SetBlockS2CPacket : IPacket
     public BlockPos Pos;
     public byte Type;
     
-    public void Read(PacketReader reader)
+    public void Read(ref PacketReader reader)
     {
-        Pos.Read(reader);
+        Pos = BlockPos.Read(ref reader);
         Type = reader.ReadByte();
     }
 
-    public void Write(PacketWriter writer)
+    public void Write(ref PacketWriter writer)
     {
-        Pos.Write(writer);
+        BlockPos.Write(ref writer, Pos);
         writer.WriteByte(Type);
     }
 }
