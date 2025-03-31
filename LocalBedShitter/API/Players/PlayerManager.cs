@@ -24,10 +24,16 @@ public sealed class PlayerManager : IPacketProcessor, IDisposable
 
     public bool IsConnected(sbyte id) => Players.Any(p => p.Id == id);
     public RemotePlayer? GetById(sbyte id) => Players.FirstOrDefault(p => p.Id == id);
+    public RemotePlayer? GetByUsername(string username) => Players.FirstOrDefault(p => p.Username == username);
 
     public bool TryGetById(sbyte id, [NotNullWhen(true)] out RemotePlayer? player)
     {
-        return (player = Players.FirstOrDefault(p => p.Id == id)) != null;
+        return (player = GetById(id)) != null;
+    }
+
+    public bool TryGetByUsername(string username, [NotNullWhen(true)] out RemotePlayer? player)
+    {
+        return (player = GetByUsername(username)) != null;
     }
     
     public void ProcessPacket(ref readonly IPacket packet)
@@ -55,7 +61,9 @@ public sealed class PlayerManager : IPacketProcessor, IDisposable
 
                 break;
             case MessagePacket message:
-                if (TryGetById(message.PlayerId, out player))
+                string? author = message.Author;
+                if (author == null) break;
+                if (TryGetByUsername(TextUtility.Sanitize(author), out player))
                 {
                     Message?.Invoke(player, TextUtility.Sanitize(message.Content));
                 }

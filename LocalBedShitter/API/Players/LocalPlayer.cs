@@ -36,7 +36,7 @@ public sealed class LocalPlayer(NetworkManager manager, string username)
     
     public void SendMessage(string message)
     {
-        Manager.SendPacket(new MessagePacket(-1, message));
+        Manager.SendPacket(new MessagePacket(message));
     }
 
     public override void ProcessPacket(ref readonly IPacket packet)
