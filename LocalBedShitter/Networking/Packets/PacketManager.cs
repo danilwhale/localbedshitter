@@ -64,14 +64,11 @@ public static class PacketManager
         stream.Write(buffer);
     }
 
-    private static void RegisterC2S()
+    static PacketManager()
     {
         Register<PlayerIdC2SPacket>(0x00);
         Register<SetBlockC2SPacket>(0x05);
-    }
-
-    private static void RegisterS2C()
-    {
+        
         Register<ServerIdS2CPacket>(0x00);
         Register<PingS2CPacket>(0x01);
         Register<LevelInitializeS2CPacket>(0x02);
@@ -85,18 +82,8 @@ public static class PacketManager
         Register<DespawnPlayerS2CPacket>(0x0c);
         Register<DisconnectPlayerS2CPacket>(0x0e);
         Register<UpdateUserTypeS2CPacket>(0x0f);
-    }
-
-    private static void RegisterBoth()
-    {
+        
         Register<MessagePacket>(0x0d);
         Register<TeleportPacket>(0x08);
-    }
-
-    static PacketManager()
-    {
-        RegisterC2S();
-        RegisterS2C();
-        RegisterBoth();
     }
 }
