@@ -1,4 +1,5 @@
-﻿using LocalBedShitter.Networking.Packets;
+﻿using System.Diagnostics.CodeAnalysis;
+using LocalBedShitter.Networking.Packets;
 
 namespace LocalBedShitter.API;
 
@@ -21,6 +22,11 @@ public struct BlockPos(short x, short y, short z)
     public BlockPos West() => this with { X = (short)(X - 1) };
     public BlockPos South() => this with { Z = (short)(Z + 1) };
     public BlockPos North() => this with { Z = (short)(Z - 1) };
+
+    public override string ToString()
+    {
+        return $"[{X}, {Y}, {Z}]";
+    }
 
     public static BlockPos Read(ref PacketReader reader)
     {

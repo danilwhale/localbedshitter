@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Text;
 using LocalBedShitter.API;
 using LocalBedShitter.API.Players;
 using LocalBedShitter.Networking;
@@ -12,7 +13,9 @@ public sealed class Bot : IPacketProcessor
     public readonly PlayerManager PlayerManager;
     public readonly LocalPlayer LocalPlayer;
     public readonly HashSet<BotCommand> Commands = [];
-
+    
+    private readonly Stack<BlockJob> _jobs = [];
+    
     public Bot(NetworkManager manager, string username, string mpPass)
     {
         Manager = manager;
@@ -76,8 +79,53 @@ public sealed class Bot : IPacketProcessor
             LocalPlayer.SetBlock(new BlockPos(x, y, z), type != 0 ? EditMode.Create : EditMode.Destroy, type);
             LocalPlayer.SendMessage($"{player.Username}: Placed block with ID {type} at {x}, {y}, {z}");
         }));
+        Commands.Add(new BotCommand("fill", 7, async (player, args) =>
+        {
+            if (!short.TryParse(args[0], out short x0) ||
+                !short.TryParse(args[1], out short y0) ||
+                !short.TryParse(args[2], out short z0) ||
+                !short.TryParse(args[3], out short x1) ||
+                !short.TryParse(args[4], out short y1) ||
+                !short.TryParse(args[5], out short z1))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid location");
+                return;
+            }
+
+            if (!byte.TryParse(args[6], out byte type))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid block ID: {type}");
+                return;
+            }
+
+            short minX = Math.Min(x0, x1), minY = Math.Min(y0, y1), minZ = Math.Min(z0, z1);
+            short maxX = Math.Max(x0, x1), maxY = Math.Max(y0, y1), maxZ = Math.Max(z0, z1);
+
+            _jobs.Push(new BlockJob(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ), type));
+            
+            LocalPlayer.SendMessage($"{player.Username}: Enqueued job to fill " +
+                                    $"{(maxX - minX) * (maxY - minY) * (maxZ - minZ)} " +
+                                    $"blocks with {type}");
+        }));
+        Commands.Add(new BotCommand("jobs", 1, async (player, args) =>
+        {
+            switch (args[0])
+            {
+                case "list":
+                    if (_jobs.Count == 0)
+                    {
+                        LocalPlayer.SendMessage($"{player.Username}: There are no jobs to do");
+                        return;
+                    }
+            
+                    LocalPlayer.SendMessage($"{player.Username}: There are {_jobs.Count} job(s) to do");
+                    break;
+            }
+        }));
 
         PlayerManager.Message += OnMessage;
+
+        Task.Run(ExecuteJobsAsync);
     }
 
     private void OnMessage(RemotePlayer player, string content)
@@ -97,6 +145,18 @@ public sealed class Bot : IPacketProcessor
         {
             Task.Run(async () => await command.InvokeAsync(player, split.Length == 1 ? [] : split[1..]));
             break;
+        }
+    }
+
+    private async Task ExecuteJobsAsync()
+    {
+        while (true)
+        {
+            while (_jobs.TryPop(out BlockJob? job))
+            {
+                await job.ExecuteAsync(LocalPlayer, 28);
+                LocalPlayer.SendMessage($"Finished filling {job.Min} {job.Max} with {job.Type}");
+            }
         }
     }
 
