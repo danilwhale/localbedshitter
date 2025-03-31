@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 using LocalBedShitter.API;
 using LocalBedShitter.API.Players;
@@ -13,6 +14,7 @@ public sealed class Bot : IPacketProcessor
     public readonly NetworkManager Manager;
     public readonly PlayerManager PlayerManager;
     public readonly LocalPlayer LocalPlayer;
+    public readonly Level Level;
     public readonly HashSet<BotCommand> Commands = [];
 
     private readonly JobPool _jobs = new();
@@ -26,6 +28,8 @@ public sealed class Bot : IPacketProcessor
 
         LocalPlayer = new LocalPlayer(manager, username);
         LocalPlayer.Authenticate(mpPass);
+
+        Level = new Level(manager);
 
         Commands.Add(new BotCommand("tp", 1, async (player, args) =>
         {
@@ -52,6 +56,10 @@ public sealed class Bot : IPacketProcessor
 
             LocalPlayer.Teleport(new Vector3(x, y, z), Vector2.Zero);
             LocalPlayer.SendMessage($"{player.Username}: Teleported to {x}, {y}, {z}");
+        }));
+        Commands.Add(new BotCommand("say", -1, async (_, args) =>
+        {
+            LocalPlayer.SendMessage(string.Join(" ", args));
         }));
         Commands.Add(new BotCommand("setblock", 4, async (player, args) =>
         {
@@ -96,18 +104,55 @@ public sealed class Bot : IPacketProcessor
 
             if (!byte.TryParse(args[6], out byte type))
             {
-                LocalPlayer.SendMessage($"{player.Username}: Invalid block ID: {type}");
+                LocalPlayer.SendMessage($"{player.Username}: Invalid block ID: {args[6]}");
                 return;
             }
 
             short minX = Math.Min(x0, x1), minY = Math.Min(y0, y1), minZ = Math.Min(z0, z1);
             short maxX = Math.Max(x0, x1), maxY = Math.Max(y0, y1), maxZ = Math.Max(z0, z1);
 
-            _jobs.Add(FillNodeJob.CreateFill(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ), type));
+            FillJob job = new(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ), type);
+            _jobs.Add(job);
 
-            LocalPlayer.SendMessage($"{player.Username}: Enqueued job to fill " +
+            LocalPlayer.SendMessage($"{player.Username}: Enqueued a job to fill " +
                                     $"{(maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1)} " +
-                                    $"blocks with {type}");
+                                    $"blocks with {type}. This will take ~{job.EstimateExecutionTime}");
+        }));
+        Commands.Add(new BotCommand("replace", 8, async (player, args) =>
+        {
+            if (!short.TryParse(args[0], out short x0) ||
+                !short.TryParse(args[1], out short y0) ||
+                !short.TryParse(args[2], out short z0) ||
+                !short.TryParse(args[3], out short x1) ||
+                !short.TryParse(args[4], out short y1) ||
+                !short.TryParse(args[5], out short z1))
+            {
+                LocalPlayer.SendMessage(
+                    $"{player.Username}: Invalid location: [{args[0]}, {args[1]}, {args[2]}]:[{args[3]}, {args[4]}, {args[5]}]");
+                return;
+            }
+
+            if (!byte.TryParse(args[6], out byte source))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid source block ID: {args[6]}");
+                return;
+            }
+            
+            if (!byte.TryParse(args[7], out byte type))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid block ID: {args[6]}");
+                return;
+            }
+
+            short minX = Math.Min(x0, x1), minY = Math.Min(y0, y1), minZ = Math.Min(z0, z1);
+            short maxX = Math.Max(x0, x1), maxY = Math.Max(y0, y1), maxZ = Math.Max(z0, z1);
+
+            ReplaceJob job = new(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ), source, type);
+            _jobs.Add(job);
+
+            LocalPlayer.SendMessage($"{player.Username}: Enqueued a job to replace " +
+                                    $"{(maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1)} " +
+                                    $"blocks of type {source} with {type}. This will take ~{job.EstimateExecutionTime:g}");
         }));
         Commands.Add(new BotCommand("sphere", 5, async (player, args) =>
         {
@@ -131,8 +176,41 @@ public sealed class Bot : IPacketProcessor
                 return;
             }
 
-            _jobs.Add(new SphereJob(new BlockPos(x, y, z), radius, type));
-            LocalPlayer.SendMessage($"{player.Username}: Enqueued job to place a sphere");
+            SphereJob job = new(new BlockPos(x, y, z), radius, type);
+            _jobs.Add(job);
+            LocalPlayer.SendMessage($"{player.Username}: Enqueued a job to place the sphere. This will take ~{job.EstimateExecutionTime:g}");
+        }));
+        Commands.Add(new BotCommand("pyramid", 6, async (player, args) =>
+        {
+            if (!short.TryParse(args[0], out short x) ||
+                !short.TryParse(args[1], out short y) ||
+                !short.TryParse(args[2], out short z))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid location: [{args[0]}, {args[1]}, {args[2]}]");
+                return;
+            }
+
+            if (!short.TryParse(args[3], out short radius))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid radius: {args[3]}");
+                return;
+            }
+
+            if (!short.TryParse(args[4], out short layers))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid layers: {args[4]}");
+                return;
+            }
+
+            if (!byte.TryParse(args[5], out byte type))
+            {
+                LocalPlayer.SendMessage($"{player.Username}: Invalid block ID: {args[5]}");
+                return;
+            }
+            
+            PyramidJob job = new(new BlockPos(x, y, z), radius, layers, type);
+            _jobs.Add(job);
+            LocalPlayer.SendMessage($"{player.Username}: Enqueued a job to place the pyramid. This will take ~{job.EstimateExecutionTime:g}");
         }));
         Commands.Add(new BotCommand("veryeasy", 3, async (player, args) =>
         {
@@ -143,9 +221,10 @@ public sealed class Bot : IPacketProcessor
                 LocalPlayer.SendMessage($"{player.Username}: Invalid location: [{args[0]}, {args[1]}, {args[2]}]");
                 return;
             }
-            
-            _jobs.Add(new VeryEasyJob(new BlockPos(x, y, z)));
-            LocalPlayer.SendMessage($"{player.Username}: Enqueued job to place its very easy");
+
+            VeryEasyJob job = new(new BlockPos(x, y, z));
+            _jobs.Add(job);
+            LocalPlayer.SendMessage($"{player.Username}: Enqueued a job to place its very easy. This will take ~{job.EstimateExecutionTime:g}");
         }));
         Commands.Add(new BotCommand("jobs", 1, async (player, args) =>
         {
@@ -158,7 +237,11 @@ public sealed class Bot : IPacketProcessor
                         return;
                     }
 
-                    LocalPlayer.SendMessage($"{player.Username}: There are {_jobs.Count} job(s) to do");
+                    LocalPlayer.SendMessage($"{player.Username}: There are {_jobs.Count} job(s) to do: ");
+                    foreach (Job job in _jobs.Queue)
+                    {
+                        LocalPlayer.SendMessage($"- {job} (~{job.EstimateExecutionTime})");
+                    }
                     break;
                 case "clear":
                     _jobs.Clear();
@@ -194,13 +277,23 @@ public sealed class Bot : IPacketProcessor
 
     private async Task ExecuteJobsAsync()
     {
+        Stopwatch jobStopwatch = new();
+        Stopwatch totalStopwatch = new();
+        
         while (true)
         {
+            if (_jobs.IsEmpty) continue;
+            int jobCount = _jobs.Count;
+            totalStopwatch.Restart();
             while (_jobs.TryRemove(out Job? job))
             {
-                await job.ExecuteAsync(LocalPlayer);
-                LocalPlayer.SendMessage($"Finished {job}. {_jobs.Count} remaining jobs");
+                jobStopwatch.Restart();
+                await job.ExecuteAsync(LocalPlayer, Level);
+                jobStopwatch.Stop();
+                LocalPlayer.SendMessage($"Finished {job} in {jobStopwatch.Elapsed:g}. {_jobs.Count} remaining jobs");
             }
+            totalStopwatch.Stop();
+            LocalPlayer.SendMessage($"Finished {jobCount} jobs in {totalStopwatch:g}");
         }
     }
 

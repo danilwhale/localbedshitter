@@ -2,13 +2,13 @@
 
 namespace LocalBedShitter.Networking.Packets.Both;
 
-public partial struct MessagePacket(string content) : IPacket
+public partial struct MessagePacket(bool partial, string content) : IPacket
 {
     public const int SizeInBytes = sizeof(sbyte) + 64;
 
     public int Length => SizeInBytes;
     
-    private sbyte _unused = -1;
+    private sbyte _unused = (sbyte)(partial ? 1 : 0);
     public string Content = content;
     public string? Author
     {

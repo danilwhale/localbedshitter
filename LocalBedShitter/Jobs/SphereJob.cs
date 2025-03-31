@@ -3,13 +3,15 @@ using LocalBedShitter.API.Players;
 
 namespace LocalBedShitter.Jobs;
 
-public sealed class SphereJob(BlockPos centerPos, short radius, byte type) : Job
+public sealed class SphereJob(BlockPos pos, short radius, byte type) : Job
 {
-    public readonly BlockPos CenterPos = centerPos;
+    public readonly BlockPos Pos = pos;
     public readonly short Radius = radius;
     public readonly byte Type = type;
-    
-    public override async Task ExecuteAsync(LocalPlayer player)
+
+    public override int BlockCount => FastMath.Floor(4.0f / 3 * MathF.PI * (Radius * Radius * Radius));
+
+    public override async Task ExecuteAsync(LocalPlayer player, Level level)
     {
         for (int x = -Radius; x <= Radius; x++)
         {
@@ -20,15 +22,10 @@ public sealed class SphereJob(BlockPos centerPos, short radius, byte type) : Job
                     float distance = -x * -x + -y * -y + -z * -z;
                     if (distance <= Radius * Radius)
                     {
-                        await SetBlockAsync(player, CenterPos + new BlockPos(x, y, z), Type);
+                        await SetBlockAsync(player, level, Pos + new BlockPos(x, y, z), Type);
                     }
                 }
             }
         }
-    }
-
-    public override string ToString()
-    {
-        return $"a sphere at {CenterPos}, r={Radius} with block {Type}";
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using LocalBedShitter.Networking.Packets;
+﻿using LocalBedShitter.Networking.Packets;
 
 namespace LocalBedShitter.API;
 
@@ -17,13 +16,6 @@ public struct BlockPos(short x, short y, short z) : IEquatable<BlockPos>
         : this((short)x, (short)y, (short)z)
     {
     }
-    
-    public BlockPos Up() => this with { Y = (short)(Y + 1) };
-    public BlockPos Down() => this with { Y = (short)(Y - 1) };
-    public BlockPos East() => this with { X = (short)(X + 1) };
-    public BlockPos West() => this with { X = (short)(X - 1) };
-    public BlockPos South() => this with { Z = (short)(Z + 1) };
-    public BlockPos North() => this with { Z = (short)(Z - 1) };
 
     public override string ToString()
     {

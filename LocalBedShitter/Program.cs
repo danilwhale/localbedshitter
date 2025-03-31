@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using LocalBedShitter;
 using LocalBedShitter.Networking;
 
-Option<string> usernameOption = new("--username", "Username for the bot");
+Option<string> usernameOption = new("--username", "Username of the bot account");
 Option<string> ipOption = new("--ip", "Target server IPv4 address");
 Option<int> portOption = new("--port", "Target server port");
 Option<string> mpPassOption = new("--mpPass", "Target server mppass");

@@ -6,7 +6,7 @@ namespace LocalBedShitter.Networking;
 
 public sealed class NetworkManager : IAsyncDisposable
 {
-    public readonly HashSet<IPacketProcessor> Processors = [];
+    public readonly List<IPacketProcessor> Processors = [];
 
     private readonly ConcurrentQueue<IPacket> _readQueue = [];
 
@@ -36,8 +36,9 @@ public sealed class NetworkManager : IAsyncDisposable
 
         while (_readQueue.TryDequeue(out IPacket? packet))
         {
-            foreach (IPacketProcessor processor in Processors.ToHashSet())
+            for (int i = 0; i < Processors.Count; i++)
             {
+                IPacketProcessor processor = Processors[i];
                 processor.ProcessPacket(in packet);
             }
         }

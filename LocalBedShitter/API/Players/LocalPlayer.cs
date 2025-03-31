@@ -36,7 +36,19 @@ public sealed class LocalPlayer(NetworkManager manager, string username)
     
     public void SendMessage(string message)
     {
-        Manager.SendPacket(new MessagePacket(message));
+        if (message.Length < 64)
+        {
+            Manager.SendPacket(new MessagePacket(false, message));
+        }
+        else
+        {
+            int count = message.Length >> 6;
+            for (int i = 0; i <= count; i++)
+            {
+                string part = message[(i << 6)..Math.Min(i + 1 << 6, message.Length)];
+                Manager.SendPacket(new MessagePacket(i != count, part));
+            }
+        }
     }
 
     public override void ProcessPacket(ref readonly IPacket packet)
