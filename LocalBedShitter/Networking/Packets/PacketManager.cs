@@ -7,15 +7,19 @@ namespace LocalBedShitter.Networking.Packets;
 
 public static class PacketManager
 {
-    private static readonly Dictionary<byte, Type> ById = [];
-    private static readonly Dictionary<Type, byte> ByType = [];
-
-    public static void
-        Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(byte id)
+    private static readonly Dictionary<byte, Type> IncomingById = [];
+    private static readonly Dictionary<Type, byte> OutgoingByType = [];
+    
+    public static void RegisterIncoming<T>(byte id)
         where T : IPacket
     {
-        ById[id] = typeof(T);
-        ByType[typeof(T)] = id;
+        IncomingById[id] = typeof(T);
+    }
+    
+    public static void RegisterOutgoing<T>(byte id)
+        where T : IPacket
+    {
+        OutgoingByType[typeof(T)] = id;
     }
 
     public static bool TryRead(Stream stream, [NotNullWhen(true)] out IPacket? packet)
@@ -28,7 +32,7 @@ public static class PacketManager
         byte id = (byte)nid;
 
         // now we can get type of the packet
-        if (!ById.TryGetValue(id, out Type? type)) return false;
+        if (!IncomingById.TryGetValue(id, out Type? type)) return false;
 
         // finally create the packet
         packet = Activator.CreateInstance(type) as IPacket;
@@ -49,7 +53,7 @@ public static class PacketManager
     public static void Write(Stream stream, IPacket packet)
     {
         // find id of the packet
-        if (!ByType.TryGetValue(packet.GetType(), out byte id)) return;
+        if (!OutgoingByType.TryGetValue(packet.GetType(), out byte id)) return;
         
         // now we can write the data
         Span<byte> buffer = stackalloc byte[packet.Length + 1 /* for packet id */];
@@ -66,24 +70,24 @@ public static class PacketManager
 
     static PacketManager()
     {
-        Register<PlayerIdC2SPacket>(0x00);
-        Register<SetBlockC2SPacket>(0x05);
-        
-        Register<ServerIdS2CPacket>(0x00);
-        Register<PingS2CPacket>(0x01);
-        Register<LevelInitializeS2CPacket>(0x02);
-        Register<LevelChunkS2CPacket>(0x03);
-        Register<LevelFinalizeS2CPacket>(0x04);
-        Register<SetBlockS2CPacket>(0x06);
-        Register<SpawnPlayerS2CPacket>(0x07);
-        Register<UpdateTransformS2CPacket>(0x09);
-        Register<MoveS2CPacket>(0x0a);
-        Register<RotateS2CPacket>(0x0b);
-        Register<DespawnPlayerS2CPacket>(0x0c);
-        Register<DisconnectPlayerS2CPacket>(0x0e);
-        Register<UpdateUserTypeS2CPacket>(0x0f);
-        
-        Register<MessagePacket>(0x0d);
-        Register<TeleportPacket>(0x08);
+        RegisterOutgoing<PlayerIdC2SPacket>(0x00);
+        RegisterIncoming<ServerIdS2CPacket>(0x00);
+        RegisterIncoming<PingS2CPacket>(0x01);
+        RegisterIncoming<LevelInitializeS2CPacket>(0x02);
+        RegisterIncoming<LevelChunkS2CPacket>(0x03);
+        RegisterIncoming<LevelFinalizeS2CPacket>(0x04);
+        RegisterOutgoing<SetBlockC2SPacket>(0x05);
+        RegisterIncoming<SetBlockS2CPacket>(0x06);
+        RegisterIncoming<SpawnPlayerS2CPacket>(0x07);
+        RegisterIncoming<TeleportPacket>(0x08);
+        RegisterOutgoing<TeleportPacket>(0x08);
+        RegisterIncoming<UpdateTransformS2CPacket>(0x09);
+        RegisterIncoming<MoveS2CPacket>(0x0a);
+        RegisterIncoming<RotateS2CPacket>(0x0b);
+        RegisterIncoming<DespawnPlayerS2CPacket>(0x0c);
+        RegisterIncoming<MessagePacket>(0x0d);
+        RegisterOutgoing<MessagePacket>(0x0d);
+        RegisterIncoming<DisconnectPlayerS2CPacket>(0x0e);
+        RegisterIncoming<UpdateUserTypeS2CPacket>(0x0f);
     }
 }
