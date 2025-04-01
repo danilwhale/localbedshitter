@@ -26,6 +26,7 @@ public sealed partial class MainBot : Bot, IAsyncDisposable
         Commands.Add(new BotCommand("say", -1, HandleSayCommand));
         Commands.Add(new BotCommand("setblock", 4, HandleSetBlockCommand));
         Commands.Add(new BotCommand("fill", 7, HandleFillCommand));
+        Commands.Add(new BotCommand("replace", 8, HandleReplaceCommand));
         Commands.Add(new BotCommand("sphere", 5, HandleSphereCommand));
         Commands.Add(new BotCommand("pyramid", 6, HandlePyramidCommand));
         Commands.Add(new BotCommand("veryeasy", 3, HandleVeryEasyCommand));
