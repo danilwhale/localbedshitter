@@ -1,11 +1,5 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Text;
-using LocalBedShitter.API;
-using LocalBedShitter.API.Players;
-using LocalBedShitter.Jobs;
+﻿using LocalBedShitter.API.Players;
 using LocalBedShitter.Networking;
-using LocalBedShitter.Networking.Packets;
 
 namespace LocalBedShitter;
 

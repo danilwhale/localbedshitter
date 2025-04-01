@@ -1,5 +1,4 @@
-﻿using LocalBedShitter.API;
-using LocalBedShitter.API.Players;
+﻿using LocalBedShitter.API.Players;
 
 namespace LocalBedShitter.Networking.Packets.S2C;
 

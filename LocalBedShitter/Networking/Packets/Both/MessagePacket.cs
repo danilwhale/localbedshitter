@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace LocalBedShitter.Networking.Packets.Both;
+﻿namespace LocalBedShitter.Networking.Packets.Both;
 
 public partial struct MessagePacket(bool partial, string content) : IPacket
 {
