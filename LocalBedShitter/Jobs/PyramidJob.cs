@@ -10,10 +10,10 @@ public sealed class PyramidJob(BlockPos pos, short radius, short layers, byte ty
     public readonly short Layers = layers;
     public readonly byte Type = type;
 
-    public override int BlockCount => FastMath.Floor(1.0f / 3 * (Radius * Radius) * Layers);
-
-    public override async Task ExecuteAsync(LocalPlayer player, Level level)
+    public override void Initialize(Level level)
     {
+        List<BlockPos> blocks = [];
+
         for (int y = 0; y <= Layers; y++)
         {
             int radius = FastMath.Floor(Radius * (1.0f - 1.0f / Layers * y));
@@ -21,9 +21,16 @@ public sealed class PyramidJob(BlockPos pos, short radius, short layers, byte ty
             {
                 for (int z = -radius; z <= radius; z++)
                 {
-                    await SetBlockAsync(player, level, Pos + new BlockPos(x, y, z), Type);
+                    blocks.Add(Pos + new BlockPos(x, y, z));
                 }
-            }   
+            }
         }
+        
+        SetupBlocks(blocks);
+    }
+
+    public override async Task ExecuteAsync(LocalPlayer player, Level level)
+    {
+        await SetBlocksAsync(player, level, Type);
     }
 }

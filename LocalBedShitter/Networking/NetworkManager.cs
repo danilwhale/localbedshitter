@@ -4,19 +4,15 @@ using LocalBedShitter.Networking.Packets;
 
 namespace LocalBedShitter.Networking;
 
-public sealed class NetworkManager : IAsyncDisposable
+public sealed class NetworkManager(TcpClient client) : IAsyncDisposable
 {
     public readonly List<IPacketProcessor> Processors = [];
 
     private readonly ConcurrentQueue<IPacket> _readQueue = [];
 
-    private readonly NetworkStream _stream;
+    public readonly TcpClient Client = client;
+    private readonly NetworkStream _stream = client.GetStream();
 
-    public NetworkManager(TcpClient client)
-    {
-        _stream = client.GetStream();
-    }
-    
     public async Task PollAsync()
     {
         while (_stream.DataAvailable)
