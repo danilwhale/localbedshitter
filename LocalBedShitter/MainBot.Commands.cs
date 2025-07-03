@@ -142,6 +142,42 @@ public sealed partial class MainBot
         return Task.CompletedTask;
     }
 
+    private Task HandleDryCommand(RemotePlayer player, string[] args)
+    {
+        if (!short.TryParse(args[0], out short x0) || !short.TryParse(args[1], out short y0) ||
+            !short.TryParse(args[2], out short z0) || !short.TryParse(args[3], out short x1) ||
+            !short.TryParse(args[4], out short y1) || !short.TryParse(args[5], out short z1))
+        {
+            LocalPlayer.SendMessage(
+                $"{player.Username}: Invalid location: [{args[0]}, {args[1]}, {args[2]}]:[{args[3]}, {args[4]}, {args[5]}]");
+            return Task.CompletedTask;
+        }
+        
+        short minX = Math.Min(x0, x1), minY = Math.Min(y0, y1), minZ = Math.Min(z0, z1);
+        short maxX = Math.Max(x0, x1), maxY = Math.Max(y0, y1), maxZ = Math.Max(z0, z1);
+
+        DryJob job = new(new BlockPos(minX, minY, minZ), new BlockPos(maxX, maxY, maxZ));
+        _jobs.Add(job);
+        
+        LocalPlayer.SendMessage($"{player.Username}: Enqueued a job to dry the area");
+        return Task.CompletedTask;
+    }
+
+    private Task HandleEatChunksCommand(RemotePlayer player, string[] args)
+    {
+        if (!int.TryParse(args[0], out int count))
+        {
+            LocalPlayer.SendMessage($"{player.Username}: Invalid count: {count}");
+            return Task.CompletedTask;
+        }
+
+        ChunkEaterJob job = new(count);
+        _jobs.Add(job);
+        
+        LocalPlayer.SendMessage($"{player.Username}: Enqueued a job to eat {job.Count} chunks");
+        return Task.CompletedTask;
+    }
+
     private Task HandleSphereCommand(RemotePlayer player, string[] args)
     {
         if (!short.TryParse(args[0], out short x) || !short.TryParse(args[1], out short y) ||

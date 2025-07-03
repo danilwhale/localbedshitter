@@ -17,16 +17,9 @@ public sealed class NetworkManager(TcpClient client) : IAsyncDisposable
     {
         while (_stream.DataAvailable)
         {
-            try
+            if (PacketManager.TryRead(_stream, out IPacket? packet))
             {
-                if (PacketManager.TryRead(_stream, out IPacket? packet))
-                {
-                    _readQueue.Enqueue(packet);
-                }
-            }
-            catch (Exception ex)
-            {
-                await Console.Error.WriteLineAsync($"Failed to read packet:\n{ex}");
+                _readQueue.Enqueue(packet);
             }
         }
 
@@ -42,14 +35,7 @@ public sealed class NetworkManager(TcpClient client) : IAsyncDisposable
 
     public void SendPacket<T>(T packet) where T : IPacket
     {
-        try
-        {
-            PacketManager.Write(_stream, packet);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to write packet:\n{ex}");
-        }
+        PacketManager.Write(_stream, packet);
     }
 
     public async ValueTask DisposeAsync()

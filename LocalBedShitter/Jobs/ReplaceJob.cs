@@ -10,26 +10,25 @@ public sealed class ReplaceJob(BlockPos min, BlockPos max, byte oldType, byte ne
     public readonly byte OldType = oldType;
     public readonly byte NewType = newType;
 
-    public override void Initialize(Level level)
+    public override async Task ExecuteAsync(PlayerPool players, Level level)
     {
-        List<BlockPos> blocks = [];
+        if (OldType == NewType) return;
+        
         for (short x = Min.X; x <= Max.X; x++)
         {
-            for (short y = Min.Y; y <= Max.Y; y++)
+            for (short z = Min.Z; z <= Max.Z; z++)
             {
-                for (short z = Min.Z; z <= Max.Z; z++)
+                short xx = x;
+                short zz = z;
+                await players.RunOrWaitAsync(async player =>
                 {
-                    byte block = level.GetBlock(x, y, z);
-                    if (block == OldType) blocks.Add(new BlockPos(x, y, z));
-                }
+                    for (short y = Max.Y; y >= Min.Y; y--)
+                    {
+                        if (level.GetBlock(xx, y, zz) != OldType) continue;
+                        await SetBlockAsync(player, level, new BlockPos(xx, y, zz), NewType);
+                    }
+                });
             }
         }
-
-        SetupBlocks(blocks);
-    }
-
-    public override async Task ExecuteAsync(LocalPlayer player, Level level)
-    {
-        await SetBlocksAsync(player, level, NewType);
     }
 }

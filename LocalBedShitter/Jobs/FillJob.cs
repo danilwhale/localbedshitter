@@ -9,26 +9,22 @@ public sealed class FillJob(BlockPos min, BlockPos max, byte type) : Job
     public readonly BlockPos Max = max;
     public readonly byte Type = type;
 
-    public override void Initialize(Level level)
+    public override async Task ExecuteAsync(PlayerPool players, Level level)
     {
-        List<BlockPos> blocks = [];
         for (short x = Min.X; x <= Max.X; x++)
         {
-            for (short y = Min.Y; y <= Max.Y; y++)
+            for (short z = Min.Z; z <= Max.Z; z++)
             {
-                for (short z = Min.Z; z <= Max.Z; z++)
+                short xx = x;
+                short zz = z;
+                await players.RunOrWaitAsync(async player =>
                 {
-                    byte block = level.GetBlock(x, y, z);
-                    if (block != Type) blocks.Add(new BlockPos(x, y, z));
-                }
+                    for (short y = Max.Y; y >= Min.Y; y--)
+                    {
+                        await SetBlockAsync(player, level, new BlockPos(xx, y, zz), Type);
+                    }
+                });
             }
         }
-
-        SetupBlocks(blocks);
-    }
-
-    public override async Task ExecuteAsync(LocalPlayer player, Level level)
-    {
-        await SetBlocksAsync(player, level, Type);
     }
 }

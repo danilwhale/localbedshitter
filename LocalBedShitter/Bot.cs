@@ -19,7 +19,7 @@ public abstract class Bot
         LocalPlayer.Authenticate(mpPass);
     }
 
-    public virtual async Task RunAsync()
+    public async Task RunAsync()
     {
         while (true)
         {
