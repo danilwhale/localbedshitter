@@ -4,6 +4,27 @@ a bot for minecraft classic servers i made when bored
 
 this is a project i was working on few months ago, most likely i won't continue developing this project anymore, so don't expect any bug fixes or things like that. if you want them, feel free to fork the project!
 
+### features
+- multibot support
+- async job execution
+
+### commands
+- `/tp <username>`: teleports main bot to specified player
+- `/tp <x> <y> <z>`: teleports main bot to specified coords
+- `/say <content>`: says specified values from the face of main bot
+- `/setblock <x> <y> <z> <id>`: sets block at specified coords
+- jobs
+  - `/fill <x0> <y0> <z0> <x1> <y1> <z1> <id>`: enqueues task to fill specified area with block
+  - `/replace <x0> <y0> <z0> <x1> <y1> <z1> <oldid> <newid>`: enqueues task to replace old block with new one in specified area
+  - `/dry <x0> <y0> <z0> <x1> <y1> <z1> <id>`: places sponges to remove water in specified area
+  - `/eatchunks <count>`: enqueues task to eat specified count of random chunks (16xMAPHEIGHTx16)
+  - `/sphere <x> <y> <z> <radius> <id>`: enqueues task to build a sphere with specified radius at coords with block
+  - `/pyramid <x> <y> <z> <radius> <height> <id>`: enqueues task to build a pyramid with specified radius, height at coords with block
+  - `/veryeasy <x> <y> <z>`: enqueues task to build an "its very easy" structure at specified coords (local joke)
+- `/jobs`
+  - `/jobs list`: lists pending jobs
+  - `/jobs clear`: clears pending jobs, however, it doesn't remove executing job
+
 ## building
 you need .net 9 sdk
 ```
