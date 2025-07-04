@@ -21,9 +21,9 @@ this is a project i was working on few months ago, most likely i won't continue 
   - `^sphere <x> <y> <z> <radius> <id>`: enqueues task to build a sphere with specified radius at coords with block
   - `^pyramid <x> <y> <z> <radius> <height> <id>`: enqueues task to build a pyramid with specified radius, height at coords with block
   - `^veryeasy <x> <y> <z>`: enqueues task to build an "its very easy" structure at specified coords (local joke)
-- `/jobs`
-  - `/jobs list`: lists pending jobs
-  - `/jobs clear`: clears pending jobs, however, it doesn't remove executing job
+- `^jobs`
+  - `^jobs list`: lists pending jobs
+  - `^jobs clear`: clears pending jobs, however, it doesn't remove executing job
 
 ## building
 you need .net 9 sdk
